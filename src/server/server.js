@@ -38,6 +38,8 @@ const InputError = require('../exceptions/InputError');
                 status: 'fail',
                 message: response.message
             })
+            console.log(JSON.stringify(response))
+            console.log(response.statusCode);
             newResponse.code(response.statusCode)
             return newResponse;
         }
