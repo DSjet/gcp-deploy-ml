@@ -8,7 +8,7 @@ const InputError = require('../exceptions/InputError');
 (async () => {
     const server = Hapi.server({
         port: process.env.PORT || 3000,
-        host: '0.0.0.0',
+        host: 'localhost',
         routes: {
             cors: {
               origin: ['*'],
@@ -26,21 +26,30 @@ const InputError = require('../exceptions/InputError');
  
         if (response instanceof InputError) {
             const newResponse = h.response({
+                code: response.output.statusCode,
                 status: 'fail',
-                message: `${response.message} Silakan gunakan foto lain.`
+                message: `${JSON.stringify(response.output.message)} Silakan gunakan foto lain.`
             })
-            newResponse.code(response.statusCode)
+            newResponse.code(parseInt(JSON.stringify(response.output.statusCode)))
             return newResponse;
         }
  
         if (response.isBoom) {
+            let message;
+            message = response.output.payload.message;
+
+            if (response.output.statusCode === 413){
+                message = "Payload content length greater than maximum allowed: 1000000"
+            }
+
             const newResponse = h.response({
+                code: response.output.statusCode,
                 status: 'fail',
-                message: response.message
+                message: message
             })
-            console.log(JSON.stringify(response))
-            console.log(response.statusCode);
-            newResponse.code(response.statusCode)
+            console.log()
+            
+            newResponse.code(parseInt(JSON.stringify(response.output.statusCode)))
             return newResponse;
         }
  
